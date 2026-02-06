@@ -1,17 +1,227 @@
 ---
+import { getCollection } from 'astro:content';
 
+const posts = (await getCollection('posts'))
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>yhna941.dev - 기술 블로그</title>
+  <meta name="description" content="C++, 성능, 시스템 프로그래밍">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #121212;
+      --bg-card: #1e1e1e;
+      --text: #ececec;
+      --text-secondary: #acacac;
+      --border: #2d2d2d;
+      --accent: #12b886;
+      --accent-hover: #20c997;
+      --code-bg: #2d2d2d;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Roboto', 'Noto Sans KR', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    header {
+      padding: 4rem 0 2rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .logo {
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent) 0%, #38d9a9 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      font-weight: 400;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    .posts-grid {
+      display: grid;
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .post-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .post-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .post-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    .post-title a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .post-title a:hover {
+      color: var(--accent);
+    }
+
+    .post-description {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      background: rgba(18, 184, 134, 0.1);
+      color: var(--accent);
+      padding: 0.375rem 0.75rem;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border: 1px solid rgba(18, 184, 134, 0.2);
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 0;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 0;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1 class="logo">yhna941</h1>
+      </div>
+      <p class="tagline">C++, 성능 최적화, 시스템 프로그래밍</p>
+    </header>
+
+    <div class="divider"></div>
+
+    <main>
+      {posts.length === 0 ? (
+        <div class="empty-state">
+          <p>아직 포스트가 없습니다.</p>
+        </div>
+      ) : (
+        <div class="posts-grid">
+          {posts.map(post => (
+            <article class="post-card">
+              <h2 class="post-title">
+                <a href={`/posts/${post.slug}/`}>{post.data.title}</a>
+              </h2>
+              <p class="post-description">{post.data.description}</p>
+              <div class="post-meta">
+                <span>
+                  📅 {post.data.pubDate.toLocaleDateString('ko-KR', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </span>
+                <span>•</span>
+                <span>✍️ {post.data.author}</span>
+              </div>
+              <div class="tags">
+                {post.data.tags.map(tag => (
+                  <span class="tag">#{tag}</span>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </main>
+
+    <footer>
+      <p>Built with Astro 🚀 • <a href="https://github.com/yhna941" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+</body>
 </html>
